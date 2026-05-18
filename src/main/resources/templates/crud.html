@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ToDOアプリ：CRUD</title>
+</head>
+
+<body>
+
+    <h1>「ToDo」アプリ：CRUD</h1>
+
+    <!--/* 登録・更新完了コメント */-->
+    <p th:if="${complete}" th:text="${complete}" style="color:blue"></p>
+
+    <!--/* ▼▼▼ Form ▼▼▼ */-->
+    <form method="POST"
+          th:action="${todoForm.newTodo} ? @{/todo/insert} : @{/todo/update}"
+          th:object="${todoForm}">
+
+        <label>タスクの内容：</label><br>
+
+        <textarea rows="5" cols="50" th:field="*{contents}"></textarea>
+
+        <br>
+
+        <div th:if="${#fields.hasErrors('contents')}"
+             th:errors="*{contents}"
+             style="color:red">
+        </div>
+
+        <label>締め切り日：</label><br>
+
+		<input type="date" th:field="*{deadln}">
+		
+        <br>
+
+        <div th:if="${#fields.hasErrors('deadln')}"
+             th:errors="*{deadln}"
+             style="color:red">
+        </div>
+
+        <br>
+		
+		<td>
+		    <form method="POST" th:action="@{/todo/priority}">
+		        <input type="hidden" name="id" th:value="${obj.id}">
+
+		        <input type="checkbox"
+		               th:checked="${obj.priority}"
+		               onchange="this.form.submit()">
+		    </form>
+		</td>
+		
+		<br>
+		
+        <input th:if="${id}" type="hidden" th:field="*{id}">
+
+        <input type="submit" value="送信">
+
+    </form>
+    <!--/* △△△ Form △△△ */-->
+
+    <br>
+
+    <!--/* ========== ここまで上部エリア ========== */-->
+    <hr>
+
+    <!--/* ========== ここから下部エリア ========== */-->
+
+    <!--/* ▼▼▼ 新規登録時のみ表示 ▼▼▼ */-->
+    <div th:if="${todoForm.newTodo}" style="margin: 10px">
+
+        <h3>
+            登録タスク一覧：
+            <a th:href="@{/todo/done}">実施済タスク履歴一覧</a><br>
+        </h3>
+
+        <!--/* 削除完了コメント */-->
+        <p th:if="${delcomplete}"
+           th:text="${delcomplete}"
+           style="color:blue">
+        </p>
+
+        <p th:if="${msg}"
+           th:text="${msg}"
+           style="color:red">
+        </p>
+
+        <!--/* ▼▼▼ タスク情報が1件でもあれば表示 ▼▼▼ */-->
+
+        <table border="1"
+               th:unless="${#lists.isEmpty(list)}"
+               style="table-layout: fixed;">
+
+            <tr>
+                <th>ID</th>
+                <th>内容</th>
+                <th>締切日</th>
+				<th>編集</th>
+                <th>実施状況</th>
+                <th>削除</th>
+            </tr>
+
+            <tr th:each="obj : ${list}" align="center">
+
+                <td th:text="${obj.id}"></td>
+
+                <td th:text="${obj.contents}" align="left"></td>
+
+                <td th:text="${obj.deadln}"></td>
+
+                <!--/* 編集ボタン */-->
+                <td>
+
+                    <form method="GET"
+                          th:action="@{/todo/{id}(id=${obj.id})}">
+
+                        <input type="submit" value="編集">
+
+                    </form>
+
+                </td>
+				
+				<!--完了チェックボックス-->
+				<td>
+				    <form method="POST" th:action="@{/todo/done}">
+				        <input type="hidden" name="id" th:value="${obj.id}">
+
+				        <input type="checkbox"
+				               th:checked="${obj.done}"
+				               onchange="this.form.submit()">
+				    </form>
+				</td>
+
+                <!--/* 削除ボタン */-->
+                <td>
+
+                    <form method="POST"
+                          th:action="@{/todo/delete}">
+
+                        <input type="hidden"
+                               name="id"
+                               th:value="${obj.id}">
+
+                        <input type="submit" value="削除">
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+        <!--/* △△△ タスク情報が1件でもあれば表示 △△△ */-->
+
+        <!--/* ▼▼▼ タスク情報が1件もない場合表示 ▼▼▼ */-->
+
+        <p th:if="${#lists.isEmpty(list)}">
+            登録されているタスクはありません。
+        </p>
+
+        <!--/* △△△ タスク情報が1件もない場合表示 △△△ */-->
+
+    </div>
+
+    <!--/* △△△ 新規登録時のみ表示 △△△ */-->
+
+    <!--/* ▼▼▼ 新規登録時でない時に表示 ▼▼▼ */-->
+
+    <p th:unless="${todoForm.newTodo}">
+        <a href="#" th:href="@{/todo}">CRUD画面へ戻る</a>
+    </p>
+
+    <!--/* △△△ 新規登録時でない時に表示 △△△ */-->
+
+</body>
+
+</html>
