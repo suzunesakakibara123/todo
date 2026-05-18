@@ -29,4 +29,5 @@ public class Todo {
     
     /**実施済チェック*/
     private Boolean done;
+    
 }

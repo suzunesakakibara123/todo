@@ -1,5 +1,7 @@
 package com.example.demo.todo.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,13 +51,25 @@ public class TodoController {
         todoForm.setNewTodo(true);
 
         // 掲示板の一覧を取得する
-        Iterable<Todo> list = service.selectAll();
+        Iterable<Todo> list = service.selectNotDoneTodo();
 
         // 表示用「Model」への格納
         model.addAttribute("list", list);
         model.addAttribute("title", "登録用フォーム");
 
         return "crud";
+    }
+    
+    /** 完了済タスク履歴一覧を表示します */
+    @GetMapping("/done")
+    public String showDoneList(Model model) {
+
+        Iterable<Todo> doneList = service.selectDoneTodo();
+
+        model.addAttribute("doneList", doneList);
+        model.addAttribute("title", "完了済タスク履歴一覧");
+
+        return "done";
     }
     
     /** Todoデータを1件挿入 */
@@ -169,6 +184,49 @@ public class TodoController {
 
         return form;
     }
+    
+    /** idをKeyにしてTodoデータを1件取得し、編集画面を表示する */
+    @GetMapping("/{id}")
+    public String showUpdate(
+            @PathVariable Integer id,
+            Model model) {
+
+        Optional<Todo> todoOpt = service.selectOneById(id);
+
+        if (todoOpt.isPresent()) {
+
+            TodoForm todoForm = makeTodoForm(todoOpt.get());
+
+            makeUpdateModel(todoForm, model);
+
+            return "crud";
+
+        } else {
+
+            return "redirect:/todo";
+        }
+    }
+    
+    /** 優先度を切り替える */
+    @PostMapping("/priority")
+    public String priority(
+            @RequestParam("id") Integer id) {
+
+        service.togglePriority(id);
+
+        return "redirect:/todo";
+    }
+    
+    /** 完了状態を切り替える */
+    @PostMapping("/done")
+    public String done(
+            @RequestParam("id") Integer id) {
+        //①完了状態にする。
+        service.toggleDone(id);
+        
+        return "redirect:/todo";
+    }
+    
     /** idをKeyにしてデータを削除する */
     @PostMapping("/delete")
     public String delete(
@@ -185,5 +243,6 @@ public class TodoController {
 
         return "redirect:/todo";
     }
+    
 
 }

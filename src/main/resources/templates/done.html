@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>完了タスク一覧</title>
+</head>
+<body>
+	<h1>完了タスク一覧</h1>
+	<p>
+	       <a th:href="@{/todo}">CRUD画面へ戻る</a>
+	   </p>
+
+	   <table border="1"
+	          th:unless="${#lists.isEmpty(doneList)}"
+	          style="table-layout: fixed;">
+
+	       <tr>
+	           <th>ID</th>
+	           <th>内容</th>
+	           <th>締切日</th>
+	           <th>優先</th>
+	       </tr>
+
+	       <tr th:each="obj : ${doneList}" align="center">
+
+	           <td th:text="${obj.id}"></td>
+
+	           <td th:text="${obj.contents}" align="left"></td>
+
+	           <td th:text="${obj.deadln}"></td>
+
+	           <td>
+	               <span th:if="${obj.priority}">★</span>
+	               <span th:unless="${obj.priority}">-</span>
+	           </td>
+
+	       </tr>
+
+	   </table>
+
+	   <p th:if="${#lists.isEmpty(doneList)}">
+	       完了済みのタスクはありません。
+	   </p>
+
+</body>
+</html>

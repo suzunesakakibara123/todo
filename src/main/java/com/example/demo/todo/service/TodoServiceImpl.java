@@ -17,8 +17,9 @@ public class TodoServiceImpl implements TodoService {
 	TodoRepository repository;
 	
 	@Override
-	public Iterable<Todo> selectAll() {
-		return repository.findAll();
+	public Iterable<Todo> selectNotDoneTodo() {
+		// TODO 自動生成されたメソッド・スタブ
+		return repository.findByDone(false);
 	}
 
 	@Override
@@ -69,5 +70,45 @@ public class TodoServiceImpl implements TodoService {
 		     repository.save(todo);
 		}
 	}
+
+	@Override
+	public Optional<Todo> selectOneById(Integer id) {
+		// TODO 自動生成されたメソッド・スタブ
+		return Optional.empty();
+	}
+
+	@Override
+	public void togglePriority(Integer id) {
+		Optional<Todo> todoOpt = repository.findById(id);
+
+	    if (todoOpt.isPresent()) {
+	        Todo todo = todoOpt.get();
+
+	        todo.setPriority(!Boolean.TRUE.equals(todo.getPriority()));
+
+	        repository.save(todo);
+	    }
+		
+	}
+
+	@Override
+	public void toggleDone(Integer id) {
+	    Optional<Todo> todoOpt = repository.findById(id);
+
+	    if (todoOpt.isPresent()) {
+	        Todo todo = todoOpt.get();
+
+	        todo.setDone(!Boolean.TRUE.equals(todo.getDone()));
+
+	        repository.save(todo);
+	    }
+	}
+	
+	@Override
+	public Iterable<Todo> selectDoneTodo() {
+	    return repository.findByDone(true);
+	}
+	
+	
 
 }

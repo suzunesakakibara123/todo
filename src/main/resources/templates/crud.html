@@ -39,21 +39,13 @@
              th:errors="*{deadln}"
              style="color:red">
         </div>
+		
+		<label>優先：</label><br>
 
+		<input type="checkbox" th:field="*{priority}">
+		
         <br>
-		
-		<td>
-		    <form method="POST" th:action="@{/todo/priority}">
-		        <input type="hidden" name="id" th:value="${obj.id}">
-
-		        <input type="checkbox"
-		               th:checked="${obj.priority}"
-		               onchange="this.form.submit()">
-		    </form>
-		</td>
-		
-		<br>
-		
+				
         <input th:if="${id}" type="hidden" th:field="*{id}">
 
         <input type="submit" value="送信">
@@ -98,7 +90,8 @@
                 <th>内容</th>
                 <th>締切日</th>
 				<th>編集</th>
-                <th>実施状況</th>
+				<th>優先</th>
+                <th>終わったらチェック</th>
                 <th>削除</th>
             </tr>
 
@@ -106,7 +99,10 @@
 
                 <td th:text="${obj.id}"></td>
 
-                <td th:text="${obj.contents}" align="left"></td>
+				<td th:text="${obj.contents}"
+				    th:style="${obj.priority} ? 'color:red; font-weight:bold;' : ''"
+				    align="left">
+				</td>
 
                 <td th:text="${obj.deadln}"></td>
 
@@ -116,11 +112,22 @@
                     <form method="GET"
                           th:action="@{/todo/{id}(id=${obj.id})}">
 
-                        <input type="submit" value="編集">
+                        <input type="submit" value="✎">
 
                     </form>
 
                 </td>
+				
+				<!--優先度チェックボックス-->
+				<td>
+				    <form method="POST" th:action="@{/todo/priority}">
+				        <input type="hidden" name="id" th:value="${obj.id}">
+
+				        <input type="checkbox"
+				               th:checked="${obj.priority}"
+				               onchange="this.form.submit()">
+				    </form>
+				</td>
 				
 				<!--完了チェックボックス-->
 				<td>
