@@ -1,14 +1,20 @@
 package com.example.demo.todo.repository;
 
+import java.time.LocalDate;
+
 import org.springframework.data.repository.CrudRepository;
 
 import com.example.demo.todo.entity.Todo;
 
-/*Todoテーブル：RepositoryImpl*/
-/**「Spring Data」が提供する「CrudRepository」を継承、<保存対象のオブジェクトの型と保存対象のオブジェクトの主キーの型を指定する。*/
-public interface TodoRepository extends CrudRepository<Todo, Integer>  {
-	//doneのBooleanの結果次第で取得するデータを変える。 
-	Iterable<Todo> findByDone(Boolean done);
+/** Todoテーブル：Repository */
+public interface TodoRepository extends CrudRepository<Todo, Integer> {
+
+    /** doneの値でTodoを取得する */
+    Iterable<Todo> findByDone(Boolean done);
+
+    /** 未完了かつ締切日が今日のTodoを取得する */
+    Iterable<Todo> findByDoneAndDeadline(Boolean done, LocalDate deadline);
+
+    /** 未完了Todoを締切日が近い順で取得する */
+    Iterable<Todo> findByDoneOrderByDeadlineAsc(Boolean done);
 }
-
-

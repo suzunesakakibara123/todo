@@ -13,46 +13,7 @@
     <!--/* 登録・更新完了コメント */-->
     <p th:if="${complete}" th:text="${complete}" style="color:blue"></p>
 
-    <!--/* ▼▼▼ Form ▼▼▼ */-->
-    <form method="POST"
-          th:action="${todoForm.newTodo} ? @{/todo/insert} : @{/todo/update}"
-          th:object="${todoForm}">
-
-        <label>タスクの内容：</label><br>
-
-        <textarea rows="5" cols="50" th:field="*{contents}"></textarea>
-
-        <br>
-
-        <div th:if="${#fields.hasErrors('contents')}"
-             th:errors="*{contents}"
-             style="color:red">
-        </div>
-
-        <label>締め切り日：</label><br>
-
-		<input type="date" th:field="*{deadln}">
-		
-        <br>
-
-        <div th:if="${#fields.hasErrors('deadln')}"
-             th:errors="*{deadln}"
-             style="color:red">
-        </div>
-		
-		<label>優先：</label><br>
-
-		<input type="checkbox" th:field="*{priority}">
-		
-        <br>
-				
-        <input th:if="${id}" type="hidden" th:field="*{id}">
-
-        <input type="submit" value="送信">
-
-    </form>
-    <!--/* △△△ Form △△△ */-->
-
+    
     <br>
 
     <!--/* ========== ここまで上部エリア ========== */-->
@@ -99,12 +60,12 @@
 
                 <td th:text="${obj.id}"></td>
 
-				<td th:text="${obj.contents}"
+				<td th:text="${obj.content}"
 				    th:style="${obj.priority} ? 'color:red; font-weight:bold;' : ''"
 				    align="left">
 				</td>
 
-                <td th:text="${obj.deadln}"></td>
+                <td th:text="${obj.deadline}"></td>
 
                 <!--/* 編集ボタン */-->
                 <td>
@@ -160,27 +121,39 @@
 
         </table>
 
-        <!--/* △△△ タスク情報が1件でもあれば表示 △△△ */-->
-
-        <!--/* ▼▼▼ タスク情報が1件もない場合表示 ▼▼▼ */-->
+		<br>
+		
+		
+        <!-- タスク情報が1件もない場合表示-->
 
         <p th:if="${#lists.isEmpty(list)}">
             登録されているタスクはありません。
         </p>
+		
+		<br>
 
-        <!--/* △△△ タスク情報が1件もない場合表示 △△△ */-->
+		<!-- 今日のタスクのみを表示 -->
+		<form method="GET" th:action="@{/todo/today}" style="display:inline;">
+		    <input type="submit" value="今日が期限のタスクのみ表示">
+		</form>
+
+		<!-- 期限が近い順に並び替える -->
+		<form method="GET" th:action="@{/todo/sort/deadline}" style="display:inline;">
+		    <input type="submit" value="期限が近い順で表示">
+		</form>
+
+		<!-- 通常表示に戻す -->
+		<form method="GET" th:action="@{/todo}" style="display:inline;">
+		    <input type="submit" value="通常表示に戻す">
+		</form>
+
+		<!-- 新規タスク追加ボタン -->
+		<form method="GET" th:action="@{/todo/create}" style="display:inline;">
+		    <input type="submit" value="＋ タスクを追加する">
+		</form>
 
     </div>
 
-    <!--/* △△△ 新規登録時のみ表示 △△△ */-->
-
-    <!--/* ▼▼▼ 新規登録時でない時に表示 ▼▼▼ */-->
-
-    <p th:unless="${todoForm.newTodo}">
-        <a href="#" th:href="@{/todo}">CRUD画面へ戻る</a>
-    </p>
-
-    <!--/* △△△ 新規登録時でない時に表示 △△△ */-->
 
 </body>
 

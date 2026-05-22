@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ToDoアプリ：タスク追加</title>
+</head>
+
+<body>
+
+    <h1>タスク追加</h1>
+
+    <form method="POST"
+          th:action="@{/todo/insert}"
+          th:object="${todoForm}">
+
+        <label>タスクの内容：</label><br>
+        <textarea rows="5" cols="50" th:field="*{content}"></textarea>
+
+        <div th:if="${#fields.hasErrors('content')}"
+             th:errors="*{content}"
+             style="color:red">
+        </div>
+
+        <br>
+
+        <label>担当者：</label><br>
+        <input type="text" th:field="*{user}">
+
+        <div th:if="${#fields.hasErrors('user')}"
+             th:errors="*{user}"
+             style="color:red">
+        </div>
+
+        <br>
+
+        <label>締め切り日：</label><br>
+        <input type="date" th:field="*{deadline}">
+
+        <br><br>
+
+        <label>優先：</label>
+        <input type="checkbox" th:field="*{priority}">
+
+        <br><br>
+
+        <input type="submit" value="登録">
+    </form>
+
+    <p>
+        <a th:href="@{/todo}">一覧へ戻る</a>
+    </p>
+
+</body>
+
+</html>

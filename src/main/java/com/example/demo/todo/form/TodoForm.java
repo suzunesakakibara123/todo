@@ -17,19 +17,23 @@ public class TodoForm {
     /** 識別ID */
     private Integer id;
 
-    /** tasuku の内容 */
+    /** タスクの内容 */
     @NotBlank
-    private String contents;
-    
-    /**締切日*/
-    private LocalDate deadln;
+    private String content;
+
+    /** タスクの担当者 */
+    @NotBlank
+    private String user;
+
+    /** 締切日 */
+    private LocalDate deadline;
 
     /** タスクの優先度 */
     private Boolean priority;
 
-    /** 実施状況*/
+    /** 実施状況 */
     private Boolean done;
-    
+
     /** 「登録」or「変更」判定用 */
     private Boolean newTodo;
 }

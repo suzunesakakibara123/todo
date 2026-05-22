@@ -1,5 +1,6 @@
 package com.example.demo.todo.service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,17 @@ public class TodoServiceImpl implements TodoService {
 	
 	@Override
 	public Iterable<Todo> selectNotDoneTodo() {
-		// TODO 自動生成されたメソッド・スタブ
 		return repository.findByDone(false);
+	}
+	
+	@Override
+	public Iterable<Todo> selectTodayTodo() {
+	    return repository.findByDoneAndDeadline(false, LocalDate.now());
+	}
+
+	@Override
+	public Iterable<Todo> selectNotDoneTodoOrderByDeadline() {
+	    return repository.findByDoneOrderByDeadlineAsc(false);
 	}
 
 	@Override
@@ -40,41 +50,10 @@ public class TodoServiceImpl implements TodoService {
 
 	}
 
-	@Override
-	// 優先度が高いタスクにチェックが付くと以下のメソッドが起動する。
-	public void markPriority(Integer id) {
-	    // 画面から送られてきたidのタスクを探す。
-	    Optional<Todo> todoOpt = repository.findById(id);
-	    // エラー回避のため、タスクがちゃんと存在するかを確認する。
-	    if (todoOpt.isPresent()) {
-	        Todo todo = todoOpt.get();
-	        // priorityを反転する(念のためnullはtrueになる設計。）
-	        todo.setPriority(!Boolean.TRUE.equals(todo.getPriority()));
-	        // 保存する。
-	        repository.save(todo);
-	    }
-	}
-
-
-	@Override
-	// 「完了」にチェックが付くと以下のメソッドが起動する。
-	public void markDone(Integer id) {
-		// 画面から送られてきたidのタスクを探す。
-	    Optional<Todo> todoOpt = repository.findById(id);
-		// エラー回避のため、タスクがちゃんと存在するかを確認する。
-		if (todoOpt.isPresent()) {
-		     Todo todo = todoOpt.get();
-		     // doneを反転する(念のためnullはtrueになる設計。）
-		     todo.setDone(!Boolean.TRUE.equals(todo.getDone()));
-		     // 保存する。
-		     repository.save(todo);
-		}
-	}
 
 	@Override
 	public Optional<Todo> selectOneById(Integer id) {
-		// TODO 自動生成されたメソッド・スタブ
-		return Optional.empty();
+		return repository.findById(id);
 	}
 
 	@Override

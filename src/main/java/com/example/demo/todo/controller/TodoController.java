@@ -1,5 +1,6 @@
 package com.example.demo.todo.controller;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,28 +46,76 @@ public class TodoController {
 
     /** Todoの一覧を表示します */
     @GetMapping
-    public String showList(TodoForm todoForm, Model model) {
+    public String showList(
+            TodoForm todoForm,
+            Model model) {
 
-        // 新規登録設定
         todoForm.setNewTodo(true);
 
-        // 掲示板の一覧を取得する
         Iterable<Todo> list = service.selectNotDoneTodo();
 
-        // 表示用「Model」への格納
         model.addAttribute("list", list);
-        model.addAttribute("title", "登録用フォーム");
+        model.addAttribute("todoForm", todoForm);
+        model.addAttribute("title", "登録タスク一覧");
+
+        return "crud";
+    }
+    
+    
+    /** タスク追加画面を表示する */
+    @GetMapping("/create")
+    public String showCreate(TodoForm todoForm, Model model) {
+
+        todoForm.setNewTodo(true);
+        todoForm.setPriority(false);
+        todoForm.setDone(false);
+
+        model.addAttribute("todoForm", todoForm);
+        model.addAttribute("title", "タスク追加");
+
+        return "create";
+    }
+    
+    /** 期限が今日のタスク一覧を表示する */
+    @GetMapping("/today")
+    public String showTodayList(TodoForm todoForm, Model model) {
+
+        todoForm.setNewTodo(true);
+
+        Iterable<Todo> list = service.selectTodayTodo();
+
+        model.addAttribute("list", list);
+        model.addAttribute("todoForm", todoForm);
+        model.addAttribute("title", "今日が期限のタスク一覧");
+
+        return "crud";
+    }
+
+    /** 期限が近い順でタスク一覧を表示する */
+    @GetMapping("/sort/deadline")
+    public String showDeadlineSortedList(TodoForm todoForm, Model model) {
+
+        todoForm.setNewTodo(true);
+
+        Iterable<Todo> list = service.selectNotDoneTodoOrderByDeadline();
+
+        model.addAttribute("list", list);
+        model.addAttribute("todoForm", todoForm);
+        model.addAttribute("title", "期限が近い順のタスク一覧");
 
         return "crud";
     }
     
     /** 完了済タスク履歴一覧を表示します */
     @GetMapping("/done")
-    public String showDoneList(Model model) {
+    public String showDoneList(
+            TodoForm todoForm,
+            Model model) {
 
         Iterable<Todo> doneList = service.selectDoneTodo();
 
         model.addAttribute("doneList", doneList);
+        model.addAttribute("todoForm", todoForm);
         model.addAttribute("title", "完了済タスク履歴一覧");
 
         return "done";
@@ -80,13 +129,15 @@ public class TodoController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        // FormからEntityへの詰め替え
+        // FormからEntityへ変換
         Todo todo = new Todo();
 
-        todo.setContents(todoForm.getContents());
-        todo.setDeadln(todoForm.getDeadln());
+        todo.setContent(todoForm.getContent());
+        todo.setUser(todoForm.getUser());
+        todo.setDeadline(todoForm.getDeadline());
         todo.setPriority(todoForm.getPriority());
         todo.setDone(todoForm.getDone());
+        todo.setCreatedAt(LocalDateTime.now());
 
         // 入力チェック
         if (!bindingResult.hasErrors()) {
@@ -153,30 +204,37 @@ public class TodoController {
         }
     }
 
-    /* ---------- 以下はFormとDomainObjectの詰めなおし ---------- */
-
-    /** TodoFormからTodoに詰め直して戻り値として返します */
+    /** TodoFormからTodoに変換して戻り値として返します */
     private Todo makeTodo(TodoForm todoForm) {
 
         Todo todo = new Todo();
 
         todo.setId(todoForm.getId());
-        todo.setContents(todoForm.getContents());
-        todo.setDeadln(todoForm.getDeadln());
+        todo.setContent(todoForm.getContent());
+        todo.setUser(todoForm.getUser());
+        todo.setDeadline(todoForm.getDeadline());
         todo.setPriority(todoForm.getPriority());
         todo.setDone(todoForm.getDone());
+        /** 更新の際は、作成日時を変更しないようにするため、既存のTodoデータを取得して作成日時をセットする */
+        Optional<Todo> oldTodoOpt =
+                service.selectOneById(todoForm.getId());
+
+        if (oldTodoOpt.isPresent()) {
+            todo.setCreatedAt(oldTodoOpt.get().getCreatedAt());
+        }
 
         return todo;
     }
 
-    /** TodoからTodoFormに詰め直して戻り値として返します */
+    /** TodoからTodoFormに変換して戻り値として返します */
     private TodoForm makeTodoForm(Todo todo) {
 
         TodoForm form = new TodoForm();
 
         form.setId(todo.getId());
-        form.setContents(todo.getContents());
-        form.setDeadln(todo.getDeadln());
+        form.setContent(todo.getContent());
+        form.setUser(todo.getUser());
+        form.setDeadline(todo.getDeadline());
         form.setPriority(todo.getPriority());
         form.setDone(todo.getDone());
 
@@ -221,7 +279,7 @@ public class TodoController {
     @PostMapping("/done")
     public String done(
             @RequestParam("id") Integer id) {
-        //①完了状態にする。
+    	
         service.toggleDone(id);
         
         return "redirect:/todo";
@@ -243,6 +301,6 @@ public class TodoController {
 
         return "redirect:/todo";
     }
-    
+   
 
 }
