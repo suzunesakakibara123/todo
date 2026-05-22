@@ -8,20 +8,16 @@
 
 <body>
 
-    <h1>「ToDo」アプリ：CRUD</h1>
+    <h1>みんなのタスクボード</h1>
 
-    <!--/* 登録・更新完了コメント */-->
+    <!--登録・更新完了メッセージ-->
     <p th:if="${complete}" th:text="${complete}" style="color:blue"></p>
 
     
     <br>
 
-    <!--/* ========== ここまで上部エリア ========== */-->
-    <hr>
-
-    <!--/* ========== ここから下部エリア ========== */-->
-
-    <!--/* ▼▼▼ 新規登録時のみ表示 ▼▼▼ */-->
+    <hr>  
+    <!--新規登録時のみ表示-->
     <div th:if="${todoForm.newTodo}" style="margin: 10px">
 
         <h3>
@@ -29,7 +25,7 @@
             <a th:href="@{/todo/done}">実施済タスク履歴一覧</a><br>
         </h3>
 
-        <!--/* 削除完了コメント */-->
+        <!--削除完了メッセージ-->
         <p th:if="${delcomplete}"
            th:text="${delcomplete}"
            style="color:blue">
@@ -40,16 +36,17 @@
            style="color:red">
         </p>
 
-        <!--/* ▼▼▼ タスク情報が1件でもあれば表示 ▼▼▼ */-->
+        <!--タスク情報が1件以上ある場合-->
 
         <table border="1"
                th:unless="${#lists.isEmpty(list)}"
                style="table-layout: fixed;">
 
             <tr>
-                <th>ID</th>
-                <th>内容</th>
-                <th>締切日</th>
+                <th>番号</th>
+				<th>担当者</th>
+                <th>期限</th>
+                <th>タスク内容</th>
 				<th>編集</th>
 				<th>優先</th>
                 <th>終わったらチェック</th>
@@ -58,16 +55,22 @@
 
             <tr th:each="obj : ${list}" align="center">
 
+				<!--id番号-->
                 <td th:text="${obj.id}"></td>
+				
+				<!--担当者-->
+				<td th:text="${obj.user}"></td>
 
-				<td th:text="${obj.content}"
-				    th:style="${obj.priority} ? 'color:red; font-weight:bold;' : ''"
-				    align="left">
-				</td>
-
+				<!--期限-->
                 <td th:text="${obj.deadline}"></td>
+				
+				<!--タスク内容-->
+				<td th:text="${obj.content}"
+								    th:style="${obj.priority} ? 'color:red; font-weight:bold;' : ''"
+								    align="left">
+								</td>
 
-                <!--/* 編集ボタン */-->
+                <!--編集ボタン-->
                 <td>
 
                     <form method="GET"
@@ -101,7 +104,7 @@
 				    </form>
 				</td>
 
-                <!--/* 削除ボタン */-->
+                <!--削除ボタン-->
                 <td>
 
                     <form method="POST"
